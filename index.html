@@ -356,6 +356,8 @@
 <script>
   // Page de paiement FedaPay — Les Délices du Fermier
   const FEDAPAY_LINK = "https://me.fedapay.com/djXDb5bN";
+  // Enregistrement automatique des commandes — Google Sheets
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzL4JERveR0Jho0U76PsPwTdtQIOMRwlMlh5Lsh3CGCD7L7I7hVXbtb5yqR1dCPK96Q/exec";
 
   
   const surprises = [
@@ -758,7 +760,64 @@
     document.getElementById('pay-link-solde').href = `${FEDAPAY_LINK}?amount=${total}&ref=${ref}`;
     document.getElementById('btn-solde-amount').textContent = total.toLocaleString() + ' FCFA';
 
+    envoyerVersGoogleSheet(ref, total, acompte, entries);
+
     document.getElementById('overlay').classList.add('open');
+  }
+
+  function envoyerVersGoogleSheet(ref, total, acompte, entries){
+    const nom = document.getElementById('nom').value || '';
+    const tel = document.getElementById('tel').value || '';
+    const adresse = document.getElementById('adresse').value || '';
+    const heure = document.getElementById('heure').value || '';
+
+    const parts = [];
+
+    entries.forEach(([id,v]) => {
+      const menu = allMenus.find(m=>m.id===id);
+      const bonusLabel = v.bonus && menu.bonusChoices ? menu.bonusChoices.find(b=>b.key===v.bonus)?.label : '';
+      const bits = [`${menu.nom} (${menu.tag}) x${v.qty}`];
+      if(v.accomps.length) bits.push(`Accomp: ${v.accomps.join(', ')}`);
+      if(v.sodas.length) bits.push(`Sodas: ${v.sodas.join(', ')}`);
+      if(bonusLabel) bits.push(`Bonus: ${bonusLabel}`);
+      parts.push(bits.join(' - '));
+    });
+
+    for(const id in surpriseCart){
+      const sur = surprises.find(x=>x.id===id);
+      for(const key in surpriseCart[id]){
+        const qty = surpriseCart[id][key];
+        if(qty > 0){
+          const size = sur.sizes.find(sz=>sz.key===key);
+          parts.push(`${sur.nom} ${size.label} x${qty}`);
+        }
+      }
+    }
+
+    for(const id in extraCart){
+      const e = extras.find(x=>x.id===id);
+      for(const key in extraCart[id]){
+        const qty = extraCart[id][key];
+        if(qty > 0){
+          const opt = e.options.find(o=>o.key===key);
+          parts.push(`${e.nom} ${opt.label} x${qty}`);
+        }
+      }
+    }
+
+    const detail = parts.join(' | ');
+
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        ref, nom, tel,
+        type: orderType,
+        adresse, heure,
+        detail, total, acompte
+      })
+    }).catch(err => console.log('Erreur envoi Google Sheets:', err));
   }
 
   function closeRecap(){
