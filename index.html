@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -46,21 +47,15 @@
 
   header{
     text-align:center;
-    padding:40px 20px 20px;
+    padding:0 0 20px;
     position:relative; z-index:1;
     border-bottom:2px solid rgba(242,183,5,0.2);
   }
-  .badge{
-    display:inline-block;
-    border:2px solid var(--plantain);
-    border-radius:999px;
-    padding:5px 14px;
-    font-size:11px;
-    letter-spacing:2px;
-    text-transform:uppercase;
-    color:var(--plantain);
-    font-weight:700;
-    margin-bottom:14px;
+  .banner-img{
+    display:block;
+    width:100%;
+    height:auto;
+    border-bottom:2px solid rgba(242,183,5,0.25);
   }
   h1{
     font-family:'Passion One',cursive;
@@ -282,8 +277,7 @@
 <div class="kitchen-pattern"></div>
 
 <header>
-  <div class="badge">100% Naturel · Frais &amp; Savoureux</div>
-  <h1>LES DÉLICES <span class="accent">DU FERMIER</span><br><span class="banner">Poulets Rôtis au Feu de Bois</span></h1>
+  <img class="banner-img" src="images/banniere.jpg" alt="Les Délices du Fermier — Poulets Rôtis au Feu de Bois">
   <div class="infos-flash">
     <span>📍 <b>Womey</b> Les Deux Manguiers</span>
     <span>📅 Disponible <b>Vendredi &amp; Lundi</b></span>
@@ -842,3 +836,4 @@
 
 </body>
 </html>
+```
